@@ -1,0 +1,9 @@
+Continuar o requisito de atualizacao... atualizar no bd
+
+fazer o delete dos carros no bd...
+
+ ------------------------------------
+
+task para adcionar um dado por vez no bd e pinecone...
+
+atualizar e deletar no pinecone.. 

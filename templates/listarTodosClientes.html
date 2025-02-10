@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes e Filhos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+    
+        h1 {
+            color: #B11016;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input[type="text"] {
+            padding: 8px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .clientes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 10px;
+        }
+    
+        .cliente {
+            background-color: white;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #B11016;
+        }
+    
+        .cliente h2 {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+    
+        .cliente p {
+            margin: 5px 0;
+            font-size: 0.9em;
+            color: #333;
+        }
+    
+        .filhos {
+            margin-top: 10px;
+            display: none;
+            padding-left: 10px;
+        }
+    
+        .filho {
+            background-color: #f9f9f9;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    
+        .toggle-button, .button-deletar, .button-atualizar, .button-adicionar {
+            cursor: pointer;
+            background-color: #e0e0e0;
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 0.9em;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-button:hover, .button-deletar:hover, .button-atualizar:hover, .button-adicionar:hover {
+            background-color: #b0b0b0;
+        }
+
+        .button-deletar {
+            background-color: #d3d3d3;
+            color: #721c24;
+        }
+    
+        .button-deletar:hover {
+            background-color: #b0b0b0;
+        }
+
+        .button-atualizar {
+            background-color: #d3d3d3;
+            color: #155724;
+        }
+
+        .button-atualizar:hover {
+            background-color: #b0b0b0;
+        }
+
+        .button-adicionar {
+            background-color: #d3d3d3;
+            color: #0056b3;
+        }
+
+        .button-adicionar:hover {
+            background-color: #b0b0b0;
+        }
+
+        .button-deletar, .button-atualizar, .button-adicionar {
+            padding: 5px 8px;
+            font-size: 0.8em;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .buttons-container form {
+            margin: 0;
+        }
+
+        .adicionar-filho-container {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .adicionar-filho-container input, .adicionar-filho-container button {
+            padding: 8px;
+            font-size: 1em;
+        }
+
+        .buttons-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .button-logout {
+           
+            bottom: 10px;
+            right: 475px;
+            background-color: #B11016;
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+
+        .button-logout:hover {
+            background-color: #8B0C13;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <h1>Clientes</h1>
+        
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Pesquisar clientes..." onkeyup="searchClients()" />
+        </div>
+        <a href="{{ url_for('home.Home') }}" class="button-logout">Voltar</a>
+    </div>
+    
+    <div class="clientes-container" id="clientesContainer">
+        {% for cliente in clientes %}
+        <div class="cliente" data-nome="{{ cliente.nome_cliente }}">
+            <h2>{{ cliente.nome_cliente }} <a href="https://wa.me/55{{ cliente.telefone }}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: #61786a;">
+                {{ cliente.telefone if cliente.telefone else '' }}
+            </a></h2>
+            <p><strong>CPF:</strong> {{ cliente.cpf }}</p>
+            <p><strong>Revisões Pendentes:</strong> {{ cliente.revisoes_pendentes }}</p>
+            <p><strong>Data Ultima Revisão:</strong> {{ cliente.data_ultima_revisao if cliente.data_ultima_revisao  else '-' }}</p>
+            <p><strong>Cônjuge:</strong> {{ cliente.nome_conjuge }}</p>
+            <p><strong>Nasc. do Cônjuge:</strong> {{ cliente.data_aniver_conjuge if cliente.data_aniver_conjuge  else '-' }}</p>
+            <p><strong>Data de Casamento:</strong> {{ cliente.data_casamento if cliente.data_casamento else '-' }}</p>
+            <p><strong>Data de Compra:</strong> {{ cliente.data_compra }}</p>
+            <p><strong>Data de Nascimento:</strong> {{ cliente.data_nascimento }}</p>
+            
+            
+            <div class="buttons-row">
+                {% set filhos_do_cliente = filhos| selectattr("id_cliente", "equalto", cliente.id_clien) | list %}
+                {% if filhos_do_cliente %}
+                    <button class="toggle-button" onclick="toggleFilhos('{{ cliente.id_clien }}')">Mostrar Filhos</button>
+                {% endif %}
+            </div>
+
+            <div id="filhos-{{ cliente.id_clien }}" class="filhos">
+                {% for filho in filhos_do_cliente %}
+                <div class="filho">
+                    <p><strong>Nome:</strong> {{ filho.nome_filho }}</p>
+                    <p><strong>Data de Nascimento:</strong> {{ filho.data_nascimento if filho.data_nascimento else '-'}}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <script>
+        function toggleFilhos(clienteId) {
+            const filhosDiv = document.getElementById(`filhos-${clienteId}`);
+            filhosDiv.style.display = filhosDiv.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function searchClients() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const clients = document.querySelectorAll('.cliente');
+            
+            clients.forEach(client => {
+                const clientName = client.getAttribute('data-nome').toLowerCase();
+                client.style.display = clientName.includes(input) ? '' : 'none';
+            });
+        }
+    </script>
+
+</body>
+</html>

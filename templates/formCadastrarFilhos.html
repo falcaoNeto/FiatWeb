@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Filho</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border: 2px solid #4B4B4D; /* Cinza-escuro para o contorno */
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #B11016; /* Vermelho Fiat */
+            text-align: center;
+        }
+
+        label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type="text"], 
+        input[type="date"], 
+        input[type="time"], 
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #4B4B4D; /* Cinza-escuro */
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            color: #ffffff;
+            background-color: #B11016; /* Vermelho Fiat */
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #8B0C13; /* Tom mais escuro de vermelho para o hover */
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .filho-container {
+            margin-bottom: 10px;
+        }
+
+        .num-filhos-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        #num_filhos {
+            width: 50px;
+            padding: 5px;
+            margin-right: 10px;
+            border: 1px solid #4B4B4D; /* Cinza-escuro */
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .button-small {
+            padding: 5px 10px;
+            color: #ffffff;
+            background-color: #B11016; /* Vermelho Fiat */
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button-small:hover {
+            background-color: #8B0C13; /* Tom mais escuro de vermelho para o hover */
+        }
+
+        .flash-message {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            color: #721c24;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            font-size: 14px;
+            text-align: center;
+        }
+    </style>
+   
+</head>
+<body>
+    <div class="form-container">
+        <h2>Cadastrar FIlho</h2>
+        <form action="{{ url_for('filho.CadastrarFilho', id=id_cliente) }}" method="POST">
+            <label for="nome">Nome do Filho:</label>
+            <input type="text" id="nome" name="nome" required>
+
+            <label for="dataN">Data de Nascimento:</label>
+            <input type="date" id="data_nascimento" name="data_nascimento">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-message">
+                    {% for category, message in messages %}
+                        {% if category == 'cadastrar filho' %}
+                            <p>{{ message }}</p>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+            
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+</body>
+</html

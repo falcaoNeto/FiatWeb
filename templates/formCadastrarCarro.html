@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Embeddings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            border: 2px solid #4B4B4D;
+        }
+        h2 {
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: #B11016;
+            text-align: center;
+        }
+        label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #B11016;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(177, 16, 22, 0.1);
+        }
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+        button {
+            padding: 12px 25px;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        button.primary {
+            background-color: #B11016;
+        }
+        button.secondary {
+            background-color: #4B4B4D;
+        }
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        button.primary:hover {
+            background-color: #8B0C13;
+        }
+        button.secondary:hover {
+            background-color: #363638;
+        }
+        .contador {
+            font-size: 12px;
+            color: #666;
+            margin: 5px 0 10px;
+        }
+        .invalido {
+            color: #ff4444;
+        }
+        .item-container {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            background-color: #fafafa;
+        }
+        .modelo-container {
+            margin-bottom: 30px;
+        }
+        .aviso {
+            font-size: 14px;
+            color: #ff4444;
+            text-align: center;
+            margin-top: 10px;
+        }
+        a.secondary {
+            text-decoration: none;
+            padding: 12px 25px;
+            color: #ffffff;
+            border-radius: 6px;
+            background-color: #4B4B4D;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        a.secondary:hover {
+            background-color: #363638;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Cadastrar Carro</h2>
+        
+        <form id="carroForm" action="{{ url_for('carro.CadastrarCarro') }}" method="POST">
+            <div class="modelo-container">
+                <label for="modelo">Informe o Modelo:</label>
+                <input type="text" id="modelo" name="modelo" required placeholder="Digite o nome do modelo...">
+            </div>
+
+            <div id="formulario">
+                <!-- Campos serão adicionados dinamicamente -->
+            </div>
+
+            <p id="mensagemErro" class="aviso" style="display: none;">
+                Por favor, preencha cada bloco dentro da margem solicitada de caracteres para enviar.
+            </p>
+            <a href="{{ url_for('home.Home') }}" class="secondary">Voltar</a>
+
+            <div class="button-group">
+                <button type="button" class="secondary" onclick="adicionarCampo()">
+                    ➕ Adicionar Campo
+                </button>
+                <button type="submit" class="primary" id="enviarInformacoes" disabled>
+                    Enviar Dados
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        let contadorCampos = 0;
+
+        function adicionarCampo() {
+            contadorCampos++;
+            const container = document.createElement("div");
+            container.className = "item-container";
+            container.id = `campo-${contadorCampos}`;
+
+            container.innerHTML = `
+                <label for="titulo${contadorCampos}">Título do Campo ${contadorCampos}:</label>
+                <input type="text" id="titulo${contadorCampos}" name="titulo${contadorCampos}" required placeholder="Digite um título...">
+                
+                <label for="campo${contadorCampos}">Conteúdo:</label>
+                <textarea id="campo${contadorCampos}" name="campo${contadorCampos}" oninput="validarTexto(${contadorCampos})" placeholder="Digite seu conteúdo aqui..."></textarea>
+                
+                <p class="contador" id="contador${contadorCampos}">🔢 Caracteres: 0 (mínimo 800, máximo 2000)</p>
+                
+                <div style="text-align: right;">
+                    <button type="button" class="secondary" onclick="removerCampo(${contadorCampos})" style="padding: 8px 15px;">
+                        Remover
+                    </button>
+                </div>
+            `;
+
+            document.getElementById("formulario").appendChild(container);
+            validarCampos();
+        }
+
+        function removerCampo(id) {
+            const elemento = document.getElementById(`campo-${id}`);
+            if (elemento) {
+                elemento.remove();
+            }
+            validarCampos();
+        }
+
+        function validarTexto(id) {
+            const campo = document.getElementById(`campo${id}`);
+            const textoOriginal = campo.value;
+            const textoNormalizado = textoOriginal.replace(/ {2,}/g, ' ');
+            const caracteres = textoNormalizado.length;
+            const contador = document.getElementById(`contador${id}`);
+
+            contador.innerHTML = `🔢 Caracteres: ${caracteres} (mínimo 800, máximo 2000)`;
+            contador.className = (caracteres < 800 || caracteres > 2000) ? "contador invalido" : "contador";
+            
+            validarCampos();
+        }
+
+        function validarCampos() {
+            const campos = document.querySelectorAll("textarea");
+            let valido = true;
+
+            if (campos.length === 0) {
+                valido = false;
+            }
+
+            campos.forEach(campo => {
+                const textoNormalizado = campo.value.replace(/ {2,}/g, ' ');
+                const caracteres = textoNormalizado.length;
+                if (caracteres < 800 || caracteres > 2000) {
+                    valido = false;
+                }
+            });
+
+            document.getElementById("enviarInformacoes").disabled = !valido;
+            document.getElementById("mensagemErro").style.display = valido ? "none" : "block";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Carro</title>
+    <!-- Manter o mesmo CSS da página de cadastro -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+            border: 2px solid #4B4B4D;
+        }
+        h2 {
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: #B11016;
+            text-align: center;
+        }
+        label {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+            font-weight: 600;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus,
+        textarea:focus {
+            border-color: #B11016;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(177, 16, 22, 0.1);
+        }
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+        button {
+            padding: 12px 25px;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        button.primary {
+            background-color: #B11016;
+        }
+        button.secondary {
+            background-color: #4B4B4D;
+        }
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        button.primary:hover {
+            background-color: #8B0C13;
+        }
+        button.secondary:hover {
+            background-color: #363638;
+        }
+        /* Caso queira utilizar o botão de voltar como link estilizado */
+        a.secondary {
+            text-decoration: none;
+            padding: 12px 25px;
+            color: #ffffff;
+            border-radius: 6px;
+            background-color: #4B4B4D;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        a.secondary:hover {
+            background-color: #363638;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Editar Carro</h2>
+        <!-- O formulário abaixo utiliza JavaScript para enviar os dados via fetch -->
+        <form action="{{ url_for('carro.AtualizarCarro', id=dado['id_carroDados']) }}" method="POST">
+            
+            <label for="titulo">Título:</label>
+            <input type="text" id="titulo" name="titulo" required value="{{ dado['titulo'] }}">
+            
+            <label for="texto">Texto:</label>
+            <textarea id="texto" name="texto" required>{{ dado['texto'] }}</textarea>
+            
+            <div class="button-group">
+                <button type="submit" class="primary">Atualizar Dados</button>
+                <a href="{{ url_for('carro.ListarCarros') }}" class="secondary">Voltar</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

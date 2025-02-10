@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulário de Cadastro</title>
+  <style>
+    /* Estilos gerais e centralização */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    /* Container principal do formulário */
+    .form-container {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      width: 100%;
+      border: 2px solid #4B4B4D;
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-size: 18px;
+      color: #B11016;
+      text-align: center;
+    }
+    label {
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 5px;
+      display: block;
+    }
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #4B4B4D;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    /* Botão de envio aprimorado */
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background-color: #B11016;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-submit:hover {
+      background-color: #8B0C13;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    /* Botão de voltar aprimorado */
+    .btn-back {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #4B4B4D;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      text-decoration: none;
+      text-align: center;
+      transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+      margin-top: 20px;
+    }
+    .btn-back:hover {
+      background-color: #363638;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .hidden { display: none; }
+    .num-filhos-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    #num_filhos {
+      width: 50px;
+      padding: 5px;
+      margin-right: 10px;
+      border: 1px solid #4B4B4D;
+      border-radius: 4px;
+      font-size: 14px;
+      text-align: center;
+    }
+    .flash-message {
+      margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 8px;
+      color: #155724;
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      font-size: 14px;
+      text-align: center;
+    }
+    /* Centralização do botão voltar */
+    .button-back {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+  <script>
+    // Função genérica para alternar a visibilidade de campos e definir se são obrigatórios
+    function toggleField(selectId, containerId, inputId) {
+      var selectElem = document.getElementById(selectId);
+      var container = document.getElementById(containerId);
+      if (inputId) {
+        var inputElem = document.getElementById(inputId);
+        if(selectId === 'revisoes') {
+          // Exibe o campo se o valor for 0, 1 ou 2
+          if (["0", "1", "2"].includes(selectElem.value)) {
+            container.classList.remove("hidden");
+            inputElem.required = true;
+          } else {
+            container.classList.add("hidden");
+            inputElem.required = false;
+          }
+        } else if(selectId === 'casado') {
+          if (selectElem.value === "Sim") {
+            container.classList.remove("hidden");
+            inputElem.required = true;
+          } else {
+            container.classList.add("hidden");
+            inputElem.required = false;
+          }
+        }
+      } else {
+        // Para o campo 'filho'
+        container.classList.toggle("hidden", selectElem.value !== "Sim");
+      }
+    }
+    // Gera dinamicamente os campos para cadastro dos filhos
+    function generateChildFields() {
+      var num = parseInt(document.getElementById("num_filhos").value, 10);
+      var container = document.getElementById("filhosContainer");
+      container.innerHTML = "";
+      for(var i = 0; i < num; i++){
+        var div = document.createElement("div");
+        div.innerHTML = 
+          '<label>Nome do Filho:</label>' +
+          '<input type="text" name="nome_filho_' + i + '" required>' +
+          '<label>Data de Nascimento do Filho:</label>' +
+          '<input type="date" name="data_nasc_filho_' + i + '">';
+        container.appendChild(div);
+      }
+    }
+    // Inicializa os campos conforme os valores atuais ao carregar a página
+    window.onload = function(){
+      toggleField('revisoes', 'revisoesFields', 'date_ultima_rev');
+      toggleField('casado', 'casamentoFields', 'nome_conjuge');
+      toggleField('filho', 'filhoFields');
+    }
+  </script>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Cadastrar Cliente</h2>
+    <form action="{{ url_for('cliente.Cadastrar') }}" method="POST">
+      <label for="nome">Nome:</label>
+      <input type="text" id="nome" name="nome" required>
+
+      <label for="cpf">CPF:</label>
+      <input type="text" id="cpf" name="cpf" required>
+
+      <label for="telefone">Telefone:</label>
+      <input type="text" id="telefone" name="telefone">
+
+      <label for="dataN">Data de Nascimento:</label>
+      <input type="date" id="dataN" name="dataN" required>
+
+      <label for="dataC">Data de Compra:</label>
+      <input type="date" id="dataC" name="dataC" required>
+
+      <label for="revisoes">Revisões a serem feitas:</label>
+      <select name="revisoes" id="revisoes" onchange="toggleField('revisoes', 'revisoesFields', 'date_ultima_rev')" required>
+        <option value="">Selecione</option>
+        <option value="0">0</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+
+      <div id="revisoesFields" class="hidden">
+        <label for="date_ultima_rev">Data da última revisão:</label>
+        <input type="date" id="date_ultima_rev" name="date_ultima_rev">
+      </div>
+
+      <label for="casado">Casado:</label>
+      <select name="casado" id="casado" onchange="toggleField('casado', 'casamentoFields', 'nome_conjuge')" required>
+        <option value="">Selecione</option>
+        <option value="Não">Não</option>
+        <option value="Sim">Sim</option>
+      </select>
+
+      <div id="casamentoFields" class="hidden">
+        <label for="nome_conjuge">Nome do Cônjuge:</label>
+        <input type="text" id="nome_conjuge" name="nome_conjuge">
+        <label for="data_aniver_conjuge">Nasc. do Cônjuge:</label>
+        <input type="date" id="data_aniver_conjuge" name="data_aniver_conjuge">
+        <label for="data_casamento">Data de Casamento:</label>
+        <input type="date" id="data_casamento" name="data_casamento">
+      </div>
+
+      <label for="filho">Filhos:</label>
+      <select name="filho" id="filho" onchange="toggleField('filho', 'filhoFields')" required>
+        <option value="">Selecione</option>
+        <option value="Não">Não</option>
+        <option value="Sim">Sim</option>
+      </select>
+
+      <div id="filhoFields" class="hidden">
+        <div class="num-filhos-container">
+          <label for="num_filhos">N° de Filhos:</label>
+          <input type="number" id="num_filhos" name="num_filhos" min="1" onchange="generateChildFields()">
+        </div>
+        <div id="filhosContainer"></div>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-message">
+            {% for category, message in messages %}
+              {% if category == 'cadastrar' %}
+                <p>{{ message }}</p>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <button type="submit" class="btn-submit">Enviar</button>
+    </form>
+    <div class="button-back">
+      <a href="{{ url_for('home.Home') }}" class="btn-back">Voltar</a>
+    </div>
+  </div>
+
+  <!-- Inclusão de jQuery e plugin de máscara -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.js"></script>
+  <script>
+    $('#cpf').mask('000.000.000-00');
+    $('#telefone').mask('(00) 0000-0000');
+  </script>
+</body>
+</html>
+    
