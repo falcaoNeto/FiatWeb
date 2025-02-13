@@ -125,12 +125,12 @@
 <body>
     <div class="form-container">
         <h2>Atualizar Cliente</h2>
-        <form action="{{ url_for('atualizar.AtualizarFilho', id=id_filho) }}" method="POST">
+        <form action="{{ url_for('filho.AtualizarFilho', id=dado['id_filho']) }}" method="POST">
             <label for="nome">Nome do Filho:</label>
-            <input type="text" id="nome" name="nome" value="{{resultado[0]['nome_filho']}}" required>
+            <input type="text" id="nome" name="nome" value="{{dado['nome_filho']}}" required>
 
             <label for="dataN">Data de Nascimento:</label>
-            <input type="date" id="dataN" name="dataN" value="{{resultado[0]['dNasc']}}">
+            <input type="date" id="dataN" name="dataN" value="{{dado['dNasc']}}">
             
             <button type="submit">Enviar</button>
         </form>

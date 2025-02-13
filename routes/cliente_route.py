@@ -3,16 +3,16 @@ from flask import Blueprint, render_template, request, session, flash, redirect,
 
 cliente_route = Blueprint("cliente",__name__)
 
-@cliente_route.route("/Cadastrar")
-def FormCadastrar():
+@cliente_route.route("/FormCadastrarCliente")
+def FormCadastrarCliente():
     if "id" not in session:
         return redirect(url_for("login.FormLogin"))
     
-    return render_template("formCadastrar.html")
+    return render_template("formCadastrarCliente.html")
 
     
-@cliente_route.route("/CadastrarDados", methods=["POST"])
-def Cadastrar():
+@cliente_route.route("/CadastrarCliente", methods=["POST"])
+def CadastrarCliente():
     if "id" not in session:
         return redirect(url_for("login.FormLogin"))
     
@@ -21,8 +21,8 @@ def Cadastrar():
     id_funcionario = session["id"]
     
     message = controllerCliente.Cadastrar(response_form, id_funcionario)
-    flash(message, "cadastrar")
-    return redirect(url_for("cliente.FormCadastrar"))
+    flash(message, "cadastrarCliente")
+    return redirect(url_for("cliente.FormCadastrarCliente"))
 
 
 
@@ -65,7 +65,7 @@ def FormAtualizarCliente(id):
         return redirect(url_for("login.FormLogin"))
     
     controllerCliente = ClienteController()
-    success, reponse, clientes, filhos, casado, TemFilho, nfilhos = controllerCliente.AtualizarClienteForm(id)
+    success, reponse, clientes, filhos, casado, TemFilho, nfilhos = controllerCliente.GetClienteAtualizar(id)
 
     if success == False:
         flash(reponse, "listarAtualizar-error")

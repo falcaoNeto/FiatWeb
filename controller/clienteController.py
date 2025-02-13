@@ -3,6 +3,7 @@ from controller.filhoController import FilhoController
 from utils import format_telefone
 from flask import session
 from datetime import datetime
+from utils import format_data
 
 
 class ClienteController:
@@ -23,7 +24,7 @@ class ClienteController:
         
         try:
 
-            id_cliente = Cliente.cadastrar(data)
+            id_cliente = Cliente.Insert(data)
 
             if response_form.get('filho') == 'Sim':
                 self._processar_filhos(response_form, id_cliente)
@@ -32,7 +33,7 @@ class ClienteController:
         except ValueError as e:
             return str(e)
         except Exception as e:
-            return f"Erro no cadastro: {str(e)}"
+            return f"Erro em cadastrar cliente: {str(e)}"
         
 
     def _processar_filhos(self, form_data, id_cliente):
@@ -61,17 +62,49 @@ class ClienteController:
 
     def ListarClientes(self):
         id_func = session.get("id")
-
         try:
-            clientes, filhos = Cliente.GetClientes(id_func)
-            return True, "", clientes, filhos, id_func
+            dados = Cliente.Select_with_idFunc(id_func)
+            clientes_dict = {}
+            filhos_list = []
+
+            for row in dados:
+                id_cliente = row['id_clien']
+                if id_cliente not in clientes_dict:
+                    clientes_dict[id_cliente] = {
+                        "id_clien": row["id_clien"],
+                        "cpf": row["cpf"],
+                        "nome_cliente": row["nome_cliente"],      
+                        "nome_conjuge": row["nome_conjuge"],
+                        "data_compra": format_data(row["data_compra"]),
+                        "data_nascimento": format_data(row["data_nascimento"]),
+                        "data_casamento": format_data(row["data_casamento"]),
+                        "id_funcionario": row["id_funcionario"],
+                        "revisoes_pendentes": row["revisoes_pendentes"],
+                        "data_aniver_conjuge": format_data(row["data_aniver_conjuge"]),
+                        "telefone": row["telefone"],
+                        "data_ultima_revisao": format_data(row["data_ultima_revisao"])
+                    }
+                
+                if row["id_filho"] is not None:
+                    filho = {
+                        "id_filho": row["id_filho"],
+                        "nome_filho": row["nome_filho"],  
+                        "data_nascimento": format_data(row["data_nascimento_filho"]),
+                        "id_cliente": row["id_cliente"]  
+                    }
+                    filhos_list.append(filho)
+
+            clientes_list = list(clientes_dict.values())
+            return True, "", clientes_list, filhos_list, id_func
+
         except Exception as e:
             return False, f"Erro ao listar clientes: {str(e)}", None, None, id_func
+
         
 
     def ListarTodosClientes(self):
         try:
-            clientes, filhos = Cliente.GetTodosClientes()
+            clientes, filhos = Cliente.SelectAll()
             return True, "", clientes, filhos
         except Exception as e:
             return False, f"Erro ao listar clientes: {str(e)}", None, None
@@ -80,17 +113,19 @@ class ClienteController:
 
     def DeletarCliente(self, id_cliente):
         try:
-            Cliente.Deletar(id_cliente)
+            Cliente.Delete(id_cliente)
             return "Cliente deletado com sucesso!"
         except Exception as e:
             return f"Erro ao deletar o cliente: {str(e)}"
         
 
 
-    def AtualizarClienteForm(self, id_cliente):
+    def GetClienteAtualizar(self, id_cliente):
         try:
-            clientes, filhos, casado, TemFilho, nfilhos = Cliente.GetClienteAtualizar(id_cliente)
+            clientes, filhos, casado, TemFilho, nfilhos = Cliente.Select_for_update(id_cliente)
+            print(clientes, filhos, casado, TemFilho, nfilhos)
             return True, "", clientes, filhos, casado, TemFilho, nfilhos
+            
         except Exception as e:
             return False, f"Erro ao listar clientes: {str(e)}", None, None, None, None, None
         
@@ -125,17 +160,10 @@ class ClienteController:
             'telefone': telefone,
             'data_ultima_revisao': dataUR
         }
-        print(data)
-        print("---------------------")
-        print(id_cliente)
-        print("---------------------")
 
-        id_client = Cliente.AtualizarClient(data, id_cliente)
-        print(id_client)
+        id_client = Cliente.Update(data, id_cliente)
 
         try:
-            # id_client = Cliente.AtualizarClient(data, id_cliente)
-            # print(id_client)
             self._processar_filhos(response_form, id_client)
             return "Atualização realizada com sucesso!"
         except ValueError as e:

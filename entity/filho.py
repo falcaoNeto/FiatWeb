@@ -2,7 +2,7 @@ from BD.bd import bd_pool
 
 class Filho:
     @staticmethod
-    def cadastrar(filho, id_cliente):
+    def Insert(filho, id_cliente):
         try:
             print(filho)
             print("--------------------------------------------------------")
@@ -18,7 +18,7 @@ class Filho:
             connect.close()
 
 
-    def Deletar(id_filho):
+    def Delete(id_filho):
         connect = None
         cursor = None
         try:
@@ -36,4 +36,41 @@ class Filho:
             if cursor:
                 cursor.close()
             if connect:
+                bd_pool.putconn(connect)
+
+    def Select_for_update(id_filho):
+        connect = None
+        cursor = None
+        try:
+            connect = bd_pool.getconn()
+            cursor = connect.cursor()
+            query = "SELECT * FROM filho WHERE id_filho = %s"
+            cursor.execute(query, (id_filho,))
+            filho = cursor.fetchone()
+
+            return filho
+        except Exception as e:
+            raise RuntimeError(f"Erro ao buscar filho: {e}")
+        finally:
+            if connect:
+                cursor.close()
+                bd_pool.putconn(connect)
+
+
+    def Update(filho):
+        connect = None
+        cursor = None
+        try:
+            connect = bd_pool.getconn()
+            cursor = connect.cursor()
+            query = "UPDATE filho SET nome = %s, data_nascimento = %s WHERE id_filho = %s"
+            cursor.execute(query, (filho["nome"], filho["data_nascimento"], filho["id_filho"]))
+            connect.commit()
+        except Exception as e:
+            if connect:
+                connect.rollback()
+            raise RuntimeError(f"Erro ao atualizar filho: {e}")
+        finally:
+            if connect:
+                cursor.close()
                 bd_pool.putconn(connect)

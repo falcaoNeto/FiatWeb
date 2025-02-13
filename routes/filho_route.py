@@ -30,6 +30,24 @@ def FormAtualizarFilho(id):
         return redirect(url_for("login.FormLogin"))
     
     controllerFilho = FilhoController()
+    filho = controllerFilho.GetFilho(id)  # Objeto do banco
+    print("--------------------------------------------------------")
+    print(filho)
+
+    return render_template("formAtualizarFilho.html", dado=filho)
+
+
+@filho_route.route("/AtualizarFilho/<int:id>", methods=["POST", "GET"])
+def AtualizarFilho(id):
+    if "id" not in session:
+        return redirect(url_for("login.FormLogin"))
+    
+    controllerFilho = FilhoController()
+    response_form = request.form
+    message = controllerFilho.AtualizarFilho(id, response_form)
+    flash(message)
+
+    return redirect(url_for("cliente.ListarClientes"))
 
 
 @filho_route.route("/DeletarFilho/<int:id>", methods=["POST", "GET"])

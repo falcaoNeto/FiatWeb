@@ -1,18 +1,11 @@
 # entity/cliente.py
 
 from BD.bd import bd_pool
-import psycopg2
+
 
 class Cliente:
     @staticmethod
-    def cadastrar(data):
-        """
-        Insere um novo cliente na tabela 'cliente' e retorna o id inserido.
-        Espera que o dicionário data contenha as chaves:
-          cpf, nome, nome_conjuge, data_compra, data_casamento,
-          data_nascimento, id_funcionario, revisoes_pendentes,
-          data_aniver_conjuge, telefone, data_ultima_revisao
-        """
+    def Insert(data):
         conn = None
         cursor = None
         try:
@@ -46,35 +39,42 @@ class Cliente:
                 bd_pool.putconn(conn)
 
     @staticmethod
-    def GetClientes(id_funcionario):
-        """
-        Retorna dois valores:
-          - uma lista de clientes cadastrados pelo funcionário (id_funcionario);
-          - uma lista de filhos desses clientes.
-        Cada cliente e filho é retornado como um dicionário.
-        """
+    def Select_with_idFunc(id_funcionario):
         conn = None
         cursor = None
         try:
             conn = bd_pool.getconn()
             cursor = conn.cursor()
-            # Buscar clientes do funcionário
-            query_clientes = "SELECT * FROM cliente WHERE id_funcionario = %s;"
-            cursor.execute(query_clientes, (id_funcionario,))
-            col_names = [desc[0] for desc in cursor.description]
-            clientes = [dict(zip(col_names, row)) for row in cursor.fetchall()]
+            query = """
+            SELECT 
+                c.id_clien,
+                c.cpf,
+                c.nome AS nome_cliente,
+                c.nome_conjuge,
+                c.data_compra,
+                c.data_nascimento,
+                c.data_casamento,
+                c.id_funcionario,
+                c.revisoes_pendentes,
+                c.data_aniver_conjuge,
+                c.telefone,
+                c.data_ultima_revisao,
+                f.id_filho,
+                f.nome AS nome_filho,
+                f.data_nascimento AS data_nascimento_filho,
+                f.id_cliente AS id_cliente
+            FROM cliente c
+            LEFT JOIN filho f ON c.id_clien = f.id_cliente
+            WHERE c.id_funcionario = %s;
 
-            # Se houver clientes, busca os filhos associados
-            client_ids = [cliente["id_clien"] for cliente in clientes]
-            filhos = []
-            if client_ids:
-                # Usando IN com uma tupla de ids
-                query_filhos = "SELECT * FROM filho WHERE id_cliente IN %s;"
-                cursor.execute(query_filhos, (tuple(client_ids),))
-                col_names_filhos = [desc[0] for desc in cursor.description]
-                filhos = [dict(zip(col_names_filhos, row)) for row in cursor.fetchall()]
+        """
+            cursor.execute(query, (id_funcionario,))
+            rows = cursor.fetchall()
+            nomes_colunas = [desc[0] for desc in cursor.description]
+            dados = [dict(zip(nomes_colunas, rows)) for rows in rows]
+            
 
-            return clientes, filhos
+            return dados
         except Exception as e:
             raise e
         finally:
@@ -84,7 +84,7 @@ class Cliente:
                 bd_pool.putconn(conn)
 
     @staticmethod
-    def GetTodosClientes():
+    def SelectAll():
         """
         Retorna todos os clientes e, para cada um, os filhos associados.
         Cada registro é convertido para dicionário.
@@ -119,7 +119,7 @@ class Cliente:
                 bd_pool.putconn(conn)
 
     @staticmethod
-    def Deletar(id_cliente):
+    def Delete(id_cliente):
         """
         Deleta o cliente cujo id é passado como parâmetro.
         Considera que as restrições (por exemplo, ON DELETE CASCADE)
@@ -144,14 +144,7 @@ class Cliente:
                 bd_pool.putconn(conn)
 
     @staticmethod
-    def GetClienteAtualizar(id_cliente):
-        """
-        Retorna os dados do cliente para atualização, juntamente com:
-          - a lista de filhos cadastrados para esse cliente;
-          - um booleano 'casado' indicando se o cliente é casado (baseado na presença de nome_conjuge);
-          - 'TemFilho' indicando se o cliente possui filhos;
-          - 'nfilhos' com a quantidade de filhos.
-        """
+    def Select_for_update(id_cliente):
         conn = None
         cursor = None
         try:
@@ -188,7 +181,7 @@ class Cliente:
                 bd_pool.putconn(conn)
 
     @staticmethod
-    def AtualizarClient(data, id_cliente):
+    def Update(data, id_cliente):
         """
         Atualiza os dados do cliente na tabela 'cliente' com os valores
         passados no dicionário data e retorna o id atualizado.
@@ -233,3 +226,6 @@ class Cliente:
                 cursor.close()
             if conn:
                 bd_pool.putconn(conn)
+
+if __name__ == "__main__":
+    ...

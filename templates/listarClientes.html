@@ -199,7 +199,7 @@
                     <p><strong>CPF:</strong> {{ cliente.cpf }}</p>
                     <p><strong>Revisões Pendentes:</strong> {{ cliente.revisoes_pendentes }}</p>
                     <p><strong>Data Ultima Revisão:</strong> {{ cliente.data_ultima_revisao if cliente.data_ultima_revisao  else '-' }}</p>
-                    <p><strong>Cônjuge:</strong> {{ cliente.nome_conjuge }}</p>
+                    <p><strong>Cônjuge:</strong> {{ cliente.nome_conjuge if cliente.nome_conjuge else '-' }}</p>
                     <p><strong>Nasc. do Cônjuge:</strong> {{ cliente.data_aniver_conjuge if cliente.data_aniver_conjuge  else '-' }}</p>
                     <p><strong>Data de Casamento:</strong> {{ cliente.data_casamento if cliente.data_casamento else '-' }}</p>
                     <p><strong>Data de Compra:</strong> {{ cliente.data_compra }}</p>
