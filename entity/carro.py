@@ -4,7 +4,7 @@ import time
 import json
 
 class Carro:
-    def cadastrarCarro(modelo):
+    def InsertCar(modelo):
         connect = None
         cursor = None
         try:
@@ -25,7 +25,7 @@ class Carro:
             if connect:
                 bd_pool.putconn(connect)
 
-    def cadastrarCarroDados(dado, id_carro):
+    def Insert_data(dado, id_carro):
         connect = None
         cursor = None
         try:
@@ -49,7 +49,7 @@ class Carro:
         
 
 
-    def cadastrarCarroPinecone(carro, id_carroDado):
+    def InsertPinecone(carro, id_carroDado):
         try:
             index_name = "carrosfiat"
             index = pc.Index(index_name)
@@ -81,7 +81,7 @@ class Carro:
 
     
 
-    def Listar():
+    def SelectAll():
         try:
             connect = bd_pool.getconn()
             cursor = connect.cursor()
@@ -97,7 +97,7 @@ class Carro:
                 cursor.close()
                 bd_pool.putconn(connect)
         
-    def DeletarBD(id_carro):
+    def Delete(id_carro):
         connect = None
         cursor = None
         try:
@@ -115,7 +115,7 @@ class Carro:
 
 
 
-    def DeletarDadoBD(id_carro):
+    def Delete_data(id_carro):
         connect = None
         cursor = None
         try:
@@ -125,14 +125,14 @@ class Carro:
             cursor.execute(query, (id_carro,))
             connect.commit()
         except Exception as e:
-            raise RuntimeError(f"Ocorreu um erro: {str(e)}", "deletar carro")
+            raise RuntimeError(f"Ocorreu um erro: {str(e)}", "deletar dados carro")
         finally:
             if connect:
                 cursor.close()
                 bd_pool.putconn(connect)    
 
 
-    def DeletarPinecone(id_carro):
+    def DeletePinecone(id_carro):
         try:
             index_name = "carrosfiat"
             index = pc.Index(index_name)
@@ -141,13 +141,13 @@ class Carro:
             raise RuntimeError(f"Ocorreu um erro: {str(e)}", "deletar carro - Pinecone")
         
 
-    def GetCarro(id_carro):
+    def Select_witgh_id(id_carro):
         connect = None
         cursor = None
         try:
             connect = bd_pool.getconn()
             cursor = connect.cursor()
-            query = "SELECT * FROM carro WHERE id = %s"
+            query = "SELECT * FROM carrodados WHERE id = %s"
             cursor.execute(query, (id_carro,))
             carro = cursor.fetchall()
 
@@ -159,33 +159,35 @@ class Carro:
                 cursor.close()
                 bd_pool.putconn(connect)
 
-    def GetCarroDados(id_carro):
-            connect = None
-            cursor = None
-            try:
-                connect = bd_pool.getconn()
-                cursor = connect.cursor()
-                query = "SELECT * FROM carrodados WHERE id = %s"
-                cursor.execute(query, (id_carro,))
-                carro = cursor.fetchall()
+    # def Select_(id_carro):
+    #         connect = None
+    #         cursor = None
+    #         try:
+    #             connect = bd_pool.getconn()
+    #             cursor = connect.cursor()
+    #             query = "SELECT * FROM carrodados WHERE id = %s"
+    #             cursor.execute(query, (id_carro,))
+    #             carro = cursor.fetchall()
 
-                return carro
-            except Exception as e:
-                raise RuntimeError(f"Ocorreu um erro: {str(e)}", "get carro")
-            finally:
-                if connect:
-                    cursor.close()
-                    bd_pool.putconn(connect)
+    #             return carro
+    #         except Exception as e:
+    #             raise RuntimeError(f"Ocorreu um erro: {str(e)}", "get carro")
+    #         finally:
+    #             if connect:
+    #                 cursor.close()
+    #                 bd_pool.putconn(connect)
 
-    def AtualizarDado(data):
+    def Update_data(data):
         connect = None
         cursor = None
         try:
             connect = bd_pool.getconn()
             cursor = connect.cursor()
-            query = "UPDATE carrodados SET titulo = %s, texto = %s WHERE id = %s"
+            query = "UPDATE carrodados SET titulo = %s, texto = %s WHERE id = %s RETURNING id"
             cursor.execute(query, (data["titulo"], data["texto"], data["id_dado"]))
+            id_carroDado = cursor.fetchone()[0]
             connect.commit()
+            return id_carroDado
         except Exception as e:
             raise RuntimeError(f"Ocorreu um erro: {str(e)}", "atualizar carro")
         finally:
@@ -194,4 +196,14 @@ class Carro:
                 bd_pool.putconn(connect)
 
 
-
+    def UpdatePinecone(carro, id_carroDado):
+        try:
+            inndex_name = "carrosfiat"
+            index = pc.Index(inndex_name)
+            response = index.fetch(ids=[str(id_carroDado)], namespace="ns1")
+            modelo = response["vectors"][str(id_carroDado)]["metadata"]["modelo"]
+            dado = {"titulo": carro["titulo"], "texto": carro["texto"], "modelo": modelo}
+            print(dado)
+            Carro.InsertPinecone(dado, id_carroDado)
+        except Exception as e:
+            raise RuntimeError(f"Ocorreu um erro: {str(e)}", "atualizar carro - Pinecone")

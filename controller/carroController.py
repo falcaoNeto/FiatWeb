@@ -7,14 +7,14 @@ class CarroController:
         try:
             modelo = respnse_form.get("modelo")
             contadorCampos = 1
-            id_carro = Carro.cadastrarCarro(modelo)
+            id_carro = Carro.InsertCar(modelo)
             while True:
                 titulo = respnse_form.get(f"titulo{contadorCampos}")
                 campo = respnse_form.get(f"campo{contadorCampos}")
                 if not campo:
                     break
-                id_carroDado = Carro.cadastrarCarroDados({"titulo": titulo, "texto": campo}, id_carro)
-                Carro.cadastrarCarroPinecone({"modelo": modelo, "titulo": titulo, "texto": campo}, id_carroDado)
+                id_carroDado = Carro.Insert_data({"titulo": titulo, "texto": campo}, id_carro)
+                Carro.InsertPinecone({"modelo": modelo, "titulo": titulo, "texto": campo}, id_carroDado)
                 print(id_carroDado)
                 contadorCampos += 1
             
@@ -32,8 +32,8 @@ class CarroController:
                 "texto": texto
             }
 
-            Carro.cadastrarCarroDados(carro, id)
-            Carro.cadastrarCarroPinecone({"modelo": modelo, "titulo": titulo, "texto": texto}, id)
+            Carro.Insert_data(carro, id)
+            Carro.InsertPinecone({"modelo": modelo, "titulo": titulo, "texto": texto}, id)
             return "Carro cadastrado com sucesso!"
         except Exception as e:
             return f"Erro ao cadastrar o carro unico Controller: {str(e)}"
@@ -44,7 +44,7 @@ class CarroController:
     def ListarCarros(self):
         try:
             # No seu código Python, agrupe os detalhes por carro:
-            carros = Carro.Listar()
+            carros = Carro.SelectAll()
             carros_agrupados = {}
             for row in carros:
                 id_carro = row[0]
@@ -69,7 +69,7 @@ class CarroController:
 
     def DeletarCarro(self, id_carro):
         try:
-            Carro.Deletar(id_carro)
+            Carro.Delete(id_carro)
             # Carro.DeletarPinecone(id_carro)
             return "Carro deletado com sucesso!"
         except Exception as e:
@@ -78,7 +78,7 @@ class CarroController:
 
     def DeletarDado(self, id_carro):
         try:
-            Carro.DeletarDados(id_carro)
+            Carro.Delete_data(id_carro)
             # Carro.DeletarPinecone(id_carro)
             return "Carro deletado com sucesso!"
         except Exception as e:
@@ -86,7 +86,7 @@ class CarroController:
         
     def VisualizarCarroDados(self, id_carroDados):
         try:
-            carroDados = Carro.GetCarroDados(id_carroDados)
+            carroDados = Carro.Select_witgh_id(id_carroDados)
             
             dado = {"id_carroDados" : carroDados[0][0], "titulo" : carroDados[0][2], "texto" : carroDados[0][3]}
             return dado
@@ -103,7 +103,8 @@ class CarroController:
                 "titulo": titulo,
                 "texto": texto
             }
-            Carro.Atualizar(carro)
+            id = Carro.Update_data(carro)
+            Carro.UpdatePinecone(carro, id)
 
             return "Carro atualizado com sucesso!"
         except Exception as e:
