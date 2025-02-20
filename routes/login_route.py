@@ -16,7 +16,7 @@ def Login():
         success, response  = controllerLogin.Verificar_Login(dados)   
 
         if not success:
-            flash(response, "login")
+            flash(str(response), "login")
             return redirect(url_for("login.FormLogin"))
 
         return redirect(url_for("home.Home"))   
